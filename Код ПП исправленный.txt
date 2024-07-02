@@ -1,0 +1,1334 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ПП_Белоруков_ИСП___312
+{
+    public partial class Vhod : Form
+    {
+        public Vhod()
+        {
+            InitializeComponent();
+        }
+        DataBase db = new DataBase();
+        string PassC = "";
+        string LoginC = "";
+
+        private void client_Click_1(object sender, EventArgs e)
+        {
+            LoginC = textLoginС.Text;
+            PassC = textPasswordС.Text;
+            DataBase.Login = LoginC;
+            if (LoginC == "" || PassC == "")
+            {
+                MessageBox.Show("Пожалуйста введите логин/пароль", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+            }
+            SqlDataAdapter adapter = new SqlDataAdapter();
+            DataTable table = new DataTable();
+            string query = $"select login, password from Client where login='{LoginC}'and password='{PassC}'";
+            SqlCommand command = new SqlCommand(query, db.getConnection());
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            if (table.Rows.Count == 1)
+            {
+                MessageBox.Show("Вы успешно вошли!", "Успешно",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                Profile prof = new Profile();
+                prof.Show();
+                this.Hide();
+
+            }
+            else
+            {
+                MessageBox.Show("Неверный логин/пароль", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+        private void exit_Click_1(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
+        }
+
+        private void admin_Click_1(object sender, EventArgs e)
+        {
+            AdminVhod admin = new AdminVhod();
+            admin.Show();
+            this.Hide();
+        }
+
+        private void buttonReg_Click_1(object sender, EventArgs e)
+        {
+            Reg reg = new Reg();
+            reg.Show();
+            this.Hide();
+        }
+        private void Vhod_Load(object sender, EventArgs e)
+        {
+            textPasswordС.UseSystemPasswordChar = true;
+            PasVis.Visible = false;
+            PasVis.Enabled = false;
+        }
+        private void PasVis_Click(object sender, EventArgs e)
+        {
+            textPasswordС.UseSystemPasswordChar = true;
+            PasVis.Visible = false;
+            PasNoVis.Visible = true;
+            PasNoVis.Enabled = true;
+            PasVis.Enabled = false;
+        }
+       
+        private void PasNoVis_Click(object sender, EventArgs e)
+        {
+            textPasswordС.UseSystemPasswordChar = false;
+            PasVis.Visible = true;
+            PasNoVis.Visible = false;
+            PasVis.Enabled = true;
+            PasNoVis.Enabled = false;
+        }
+    }
+ public partial class Reg : Form
+ {
+     public Reg()
+     {
+         InitializeComponent();
+     }
+     Vhod vhod = new Vhod();
+     DataBase db = new DataBase();
+     string voityA = "";
+     bool regi = false;
+     string PassC = "";
+     string LoginC = "";
+     string number = "";
+
+     private void BackReg_Click_1(object sender, EventArgs e)
+     {
+         vhod.Show();
+         this.Hide();
+     }
+
+     private void button1_Click_1(object sender, EventArgs e)
+     {
+         if (textPassC.Text == textPassC2.Text)
+         {
+             LoginC = textLogC.Text;
+             PassC = textPassC.Text;
+             number = NomerT.Text;
+             DataBase.Login = LoginC;
+             if (LoginC == "" || PassC == "")
+             {
+                 MessageBox.Show("Пожалуйста введите логин/пароль", "Ошибка",
+                 MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+             }
+             SqlDataAdapter adapter = new SqlDataAdapter();
+             DataTable table = new DataTable();
+             string query = $"select login from Client where login='{LoginC}'";
+             SqlCommand cmd = new SqlCommand(query, db.getConnection());
+             adapter.SelectCommand = cmd;
+             adapter.Fill(table);
+             db.openConnection();
+             if (table.Rows.Count == 0)
+             {
+                 SqlCommand insert = new SqlCommand($"insert into Client (login,password, number) values ('{LoginC}','{PassC}','{number}')", db.getConnection());
+                 if (insert.ExecuteNonQuery() == 1)
+                     MessageBox.Show("Регистрация прошла успешно!", "Успешно",
+                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+                 vhod.Show();
+                 this.Hide();
+             }
+             else
+             {
+                 MessageBox.Show("Такой логин уже существует");
+             }
+             db.closeConnection();
+
+         }
+         else
+             MessageBox.Show("Пароли не совпадают!");
+     }
+
+     private void Reg_Load(object sender, EventArgs e)
+     {
+         textPassC.UseSystemPasswordChar = true;
+         textPassC2.UseSystemPasswordChar = true;
+         PasVisReg.Visible = false;
+         PasVisReg.Enabled = false;
+         PasVisReg2.Visible = false;
+         PasVisReg2.Enabled = false;
+     }
+
+     private void PasNoVisReg_Click(object sender, EventArgs e)
+     {
+         textPassC.UseSystemPasswordChar = false;
+         PasVisReg.Visible = true;
+         PasNoVisReg.Visible = false;
+         PasVisReg.Enabled = true;
+         PasNoVisReg.Enabled = false;
+     }
+
+     private void PasNoVisReg2_Click(object sender, EventArgs e)
+     {
+         textPassC2.UseSystemPasswordChar = false;
+         PasVisReg2.Visible = true;
+         PasNoVisReg2.Visible = false;
+         PasVisReg2.Enabled = true;
+         PasNoVisReg2.Enabled = false;
+     }
+
+     private void PasVisReg_Click(object sender, EventArgs e)
+     {
+         textPassC.UseSystemPasswordChar = true;
+         PasVisReg.Visible = false;
+         PasNoVisReg.Visible = true;
+         PasNoVisReg.Enabled = true;
+         PasVisReg.Enabled = false;
+     }
+
+     private void PasVisReg2_Click(object sender, EventArgs e)
+     {
+         textPassC2.UseSystemPasswordChar = true;
+         PasVisReg2.Visible = false;
+         PasNoVisReg2.Visible = true;
+         PasNoVisReg2.Enabled = true;
+         PasVisReg2.Enabled = false;
+     }
+ }
+public partial class Profile : Form
+{
+    DataBase db = new DataBase();
+    public Profile()
+    {
+        InitializeComponent();
+    }
+    private void CreateColumns()
+    {
+        OrderGrid.Columns.Add("ID", "Номер заказа");
+        OrderGrid.Columns.Add("Price", "Цена (дол)");
+        OrderGrid.Columns.Add("Adres", "Адрес");
+        OrderGrid.Columns.Add("status", "Статус заказа");
+    }
+    private void ReadSingleRow(DataGridView dgw, IDataRecord record)
+    {
+        dgw.Rows.Add(record.GetInt32(0), record.GetInt32(1), record.GetString(2), record.GetString(3), RowState.ModifiedNew);
+    }
+    private void RefreshDataGrid(DataGridView dgw)
+    {
+        dgw.Rows.Clear();
+        string query = $"select ID_zakaza, Price, Adres, Status from Orders where Name ='{DataBase.Login}'";
+        SqlCommand command = new SqlCommand(query, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRow(dgw, reader);
+        }
+        reader.Close();
+    }
+    int OrderID = 1;
+
+    private void back_Click_1(object sender, EventArgs e)
+    {
+        Vhod vhod = new Vhod();
+        vhod.Show();
+        this.Hide();
+    }
+
+    private void zakaz_Click(object sender, EventArgs e)
+    {
+        SqlDataAdapter adapter = new SqlDataAdapter();
+        DataTable table = new DataTable();
+        string query = $"select ID_zakaza from Orders";
+        SqlCommand cmd = new SqlCommand(query, db.getConnection());
+        adapter.SelectCommand = cmd;
+        adapter.Fill(table);
+        db.openConnection();
+        for (int i = 0; i < table.Rows.Count; i++)
+        {
+            OrderID++;
+        }
+        DataBase.ID_zakaza = OrderID;
+        Zakaz zakaz = new Zakaz();
+        zakaz.Show();
+        this.Hide();
+    }
+
+    private void Profile_Load_1(object sender, EventArgs e)
+    {
+        CreateColumns();
+        RefreshDataGrid(OrderGrid);
+        label1.Text = "Профиль: " + DataBase.Login;
+    }
+}
+enum RowState
+{
+    Existed,
+    New,
+    Modified,
+    ModifiedNew,
+    Deleted
+}
+public partial class Zakaz : Form
+{
+    DataBase database = new DataBase();
+    public Zakaz()
+    {
+        InitializeComponent();
+    }
+    private void CreateColumns()
+    {
+        ZakazGrid.Columns.Add("Name", "Название");
+        ZakazGrid.Columns.Add("Recipe", "Ингредиенты");
+        ZakazGrid.Columns.Add("Price", "Цена (дол)");
+
+    }
+    private void ReadSingleRow(DataGridView dgw, IDataRecord record)
+    {
+        dgw.Rows.Add(record.GetString(0), record.GetString(1), record.GetInt32(2), RowState.ModifiedNew);
+    }
+    private void RefreshDataGrid(DataGridView dgw)
+    {
+        dgw.Rows.Clear();
+        string query = $"select Name, Recipe, Price from Zakaz where Nomer = {DataBase.ID_zakaza}";
+        SqlCommand command = new SqlCommand(query, database.getConnection());
+        database.openConnection();
+        SqlDataReader reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRow(dgw, reader);
+        }
+        reader.Close();
+    }
+
+    int price = 0;
+
+    string status = "Ожидание";
+
+
+    private void back_Click_1(object sender, EventArgs e)
+    {
+        Profile profile = new Profile();
+        profile.Show();
+        this.Hide();
+    }
+
+    private void Catalog_Click_1(object sender, EventArgs e)
+    {
+        Catalog catalog = new Catalog();
+        catalog.Show();
+        this.Hide();
+    }
+
+    private void NewSubOk_Click_1(object sender, EventArgs e)
+    {
+        if (pay.Text == "" || AdresBox.Text == "" || price == 0)
+        {
+            MessageBox.Show("Пожалуйста введите данные", "Ошибка",
+                   MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+        }
+        else
+        {
+            Price.Text = "0 $";
+            DataBase.Price = 0;
+            SqlDataAdapter adapter = new SqlDataAdapter();
+            DataTable table = new DataTable();
+            string query = $"login from Client where login='{DataBase.Login}'";
+            SqlCommand cmd = new SqlCommand(query, database.getConnection());
+            adapter.SelectCommand = cmd;
+            database.openConnection();
+            if (table.Rows.Count == 0)
+            {
+                SqlCommand insert = new SqlCommand($"insert into Orders (ID_zakaza, Name, Price, Adres, Pay, Status) " +
+                    $"values ('{DataBase.ID_zakaza}','{DataBase.Login}','{price}','{AdresBox.Text}','{pay.Text}', '{status}')",
+                    database.getConnection());
+                if (insert.ExecuteNonQuery() == 1)
+                    MessageBox.Show("Заявка отправлена!", "Успешно",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            Profile profile = new Profile();
+            profile.Show();
+            this.Hide();
+        }
+    }
+
+    private void Zakaz_Load_1(object sender, EventArgs e)
+    {
+        CreateColumns();
+        RefreshDataGrid(ZakazGrid);
+        price = price + DataBase.Price;
+        Price.Text = price.ToString() + " $";
+    }
+}
+ public partial class Catalog : Form
+ {
+     DataBase db = new DataBase();
+     public Catalog()
+     {
+         InitializeComponent();
+     }
+     string name = "";
+     string recipe = "";
+     int price = 0;
+     private void button1_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 10;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label6.Text}','{label8.Text}','{10}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button2_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 8;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label10.Text}','{label16.Text}','{8}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button3_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 9;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label14.Text}','{label17.Text}','{9}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button4_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 10;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label21.Text}','{label23.Text}','{10}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button8_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 12;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label50.Text}','{label48.Text}','{12}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button7_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 8;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label1.Text}','{label40.Text}','{8}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button6_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 11;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label42.Text}','{label37.Text}','{11}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button5_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 14;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label36.Text}','{label33.Text}','{14}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button16_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 16;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label95.Text}','{label93.Text}','{16}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button15_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 15;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label91.Text}','{label85.Text}','{15}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button14_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 22;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label87.Text}','{label82.Text}','{22}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button13_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 16;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label98.Text}','{label78.Text}','{16}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button12_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 7;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label71.Text}','{label69.Text}','{7}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button11_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 4;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label51.Text}','{label61.Text}','{4}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button10_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 6;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label63.Text}','{label58.Text}','{6}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void button9_Click_1(object sender, EventArgs e)
+     {
+         DataBase.Price += 4;
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"login from Client where login='{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Zakaz (Name, Recipe,Price, Zakazchik, Nomer) values ('{label57.Text}','{label54.Text}','{4}','{DataBase.Login}','{DataBase.ID_zakaza}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1)
+                 MessageBox.Show("Заявка отправлена!", "Успешно",
+             MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+     private void back_Click_1(object sender, EventArgs e)
+     {
+         Zakaz zakaz = new Zakaz();
+         zakaz.Show();
+         this.Hide();
+     }
+ }
+ public partial class AdminVhod : Form
+ {
+     public AdminVhod()
+     {
+         InitializeComponent();
+     }
+     private void back_Click_1(object sender, EventArgs e)
+     {
+         Vhod vhod = new Vhod();
+         vhod.Show();
+         this.Hide();
+     }
+
+     private void admin_Click(object sender, EventArgs e)
+     {
+         if (textLoginA.Text == "" || textPasswordA.Text == "")
+         {
+             MessageBox.Show("Пожалуйста введите логин/пароль", "Ошибка",
+             MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+         }
+         if (textLoginA.Text == "admin" && textPasswordA.Text == "admin")
+         {
+             MessageBox.Show("Вы успешно вошли!", "Успешно",
+                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+             AdminProf adminProf = new AdminProf();
+             adminProf.Show();
+             this.Hide();
+         }
+         else
+         {
+             MessageBox.Show("Неверный логин/пароль", "Ошибка",
+                 MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+         }
+     }
+
+     private void AdminVhod_Load(object sender, EventArgs e)
+     {
+         textPasswordA.UseSystemPasswordChar = true;
+         PasVis.Visible = false;
+         PasVis.Enabled = false;
+     }
+
+     private void PasVis_Click(object sender, EventArgs e)
+     {
+         textPasswordA.UseSystemPasswordChar = true;
+         PasVis.Visible = false;
+         PasNoVis.Visible = true;
+         PasNoVis.Enabled = true;
+         PasVis.Enabled = false;
+     }
+
+     private void PasNoVis_Click(object sender, EventArgs e)
+     {
+         textPasswordA.UseSystemPasswordChar = false;
+         PasVis.Visible = true;
+         PasNoVis.Visible = false;
+         PasVis.Enabled = true;
+         PasNoVis.Enabled = false;
+     }
+ }
+ public partial class AdminProf : Form
+ {
+     DataBase db = new DataBase();
+     public AdminProf()
+     {
+         InitializeComponent();
+     }
+     private void CreateColumnsZ()
+     {
+         Zakazi.Columns.Add("ID", "Номер заказа");
+         Zakazi.Columns.Add("Name", "Заказчик");
+         Zakazi.Columns.Add("Price", "Цена (дол)");
+         Zakazi.Columns.Add("Adres", "Адрес доставки");
+         Zakazi.Columns.Add("Pay", "Способ оплаты");
+         Zakazi.Columns.Add("Status", "Статус заказа");
+     }
+     private void ReadSingleRowZ(DataGridView dgw, IDataRecord record)
+     {
+         dgw.Rows.Add(record.GetInt32(0), record.GetString(1), record.GetInt32(2), record.GetString(3), record.GetString(4), record.GetString(5), RowState.ModifiedNew);
+     }
+     private void RefreshDataGridZ(DataGridView dgw)
+     {
+         dgw.Rows.Clear();
+         string query = $"select * from Orders";
+         SqlCommand command = new SqlCommand(query, db.getConnection());
+         db.openConnection();
+         SqlDataReader reader = command.ExecuteReader();
+         while (reader.Read())
+         {
+             ReadSingleRowZ(dgw, reader);
+         }
+         reader.Close();
+     }
+     private void CreateColumnsP()
+     {
+         Postavki.Columns.Add("ID", "Номер поставки");
+         Postavki.Columns.Add("Firm", "Фирма");
+         Postavki.Columns.Add("Postavka", "Поставка");
+         Postavki.Columns.Add("Date_zak", "Дата заказа поставки");           
+         Postavki.Columns.Add("Status", "Статус поставки");
+     }
+     private void ReadSingleRowP(DataGridView dgw, IDataRecord record)
+     {
+         dgw.Rows.Add(record.GetInt32(0), record.GetString(1), record.GetString(2), record.GetDateTime(3), record.GetString(4), RowState.ModifiedNew);
+     }
+     private void RefreshDataGridP(DataGridView dgw)
+     {
+         dgw.Rows.Clear();
+         string query = $"select * from Postavki";
+         SqlCommand command = new SqlCommand(query, db.getConnection());
+         db.openConnection();
+         SqlDataReader reader = command.ExecuteReader();
+         while (reader.Read())
+         {
+             ReadSingleRowP(dgw, reader);
+         }
+         reader.Close();
+     }
+     private void CreateColumnsS()
+     {
+         Sklad.Columns.Add("Tovar", "Продукт");
+         Sklad.Columns.Add("Kolvo", "Количество");
+         Sklad.Columns.Add("Izmer", "Ед. изм.");
+         Sklad.Columns.Add("SrokGod", "Срок годности");           
+     }
+     private void ReadSingleRowS(DataGridView dgw, IDataRecord record)
+     {
+         dgw.Rows.Add(record.GetString(0), record.GetInt32(1), record.GetString(2), record.GetString(3), RowState.ModifiedNew);
+     }
+     private void RefreshDataGridS(DataGridView dgw)
+     {
+         dgw.Rows.Clear();
+         string query = $"select * from Sklad";
+         SqlCommand command = new SqlCommand(query, db.getConnection());
+         db.openConnection();
+         SqlDataReader reader = command.ExecuteReader();
+         while (reader.Read())
+         {
+             ReadSingleRowS(dgw, reader);
+         }
+         reader.Close();
+     }
+     private void back_Click_1(object sender, EventArgs e)
+     {
+         AdminVhod adminVhod = new AdminVhod();
+         adminVhod.Show();
+         this.Hide();
+     }
+
+     private void AdminProf_Load_1(object sender, EventArgs e)
+     {
+         CreateColumnsZ();
+         RefreshDataGridZ(Zakazi);
+         CreateColumnsP();
+         RefreshDataGridP(Postavki);
+         CreateColumnsS();
+         RefreshDataGridS(Sklad);
+     }
+
+     private void ViewZak_Click(object sender, EventArgs e)
+     {
+         ViewZak viewZak = new ViewZak();
+         viewZak.Show();
+         this.Hide();
+     }
+
+     private void ZakStatus_Click(object sender, EventArgs e)
+     {
+         ChangeStatus changeStatus = new ChangeStatus();
+         changeStatus.Show();     
+     }
+
+     private void ZakPos_Click(object sender, EventArgs e)
+     {
+         ZakazPos zakazPos = new ZakazPos();
+         zakazPos.Show();
+         this.Hide();
+     }
+
+     private void PosStatus_Click(object sender, EventArgs e)
+     {
+         ChangeStatPos changeStatPos = new ChangeStatPos();
+         changeStatPos.Show();
+     }
+
+     private void DobTov_Click(object sender, EventArgs e)
+     {
+         DobTov dobTov = new DobTov();
+         dobTov.Show();
+         this.Hide();
+     }
+
+     private void SpisTov_Click(object sender, EventArgs e)
+     {
+         SkladChange skladChange = new SkladChange();
+         skladChange.Show();
+     }
+ }
+public partial class ChangeStatus : Form
+{
+    DataBase db = new DataBase();
+    public ChangeStatus()
+    {
+        InitializeComponent();
+    }
+    private void CreateColumns()
+    {
+        Status.Columns.Add("ID", "Номер заказа");
+        Status.Columns.Add("Name", "Заказчик");
+        Status.Columns.Add("Price", "Цена (дол)");
+        Status.Columns.Add("Adres", "Адрес доставки");
+        Status.Columns.Add("Pay", "Способ оплаты");
+        Status.Columns.Add("Status", "Статус заказа");
+    }
+    private void ReadSingleRow(DataGridView dgw, IDataRecord record)
+    {
+        dgw.Rows.Add(record.GetInt32(0), record.GetString(1), record.GetInt32(2), record.GetString(3), record.GetString(4), record.GetString(5), RowState.ModifiedNew);
+    }
+    private void RefreshDataGrid(DataGridView dgw)
+    {
+        string idd = ZakID.Text;
+        int ID = Int32.Parse(idd);
+        dgw.Rows.Clear();
+        string query = $"select * from Orders where ID_zakaza ='{ID}'";
+        SqlCommand command = new SqlCommand(query, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRow(dgw, reader);
+        }
+        reader.Close();
+    }
+    private void Search(DataGridView dgw) 
+    {
+        string idd = ZakID.Text;
+        int ID = Int32.Parse(idd);
+        dgw.Rows.Clear();
+        string search = $"select * from Orders where ID_zakaza ='{ID}'";
+        SqlCommand com = new SqlCommand(search, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRow(dgw, reader);
+        }
+        reader.Close();
+    }
+    private void back_Click(object sender, EventArgs e)
+    {
+        this.Hide();
+    }
+
+    private void button1_Click(object sender, EventArgs e)
+    {         
+        string idd = ZakID.Text;
+        int ID = Int32.Parse(idd);
+        SqlDataAdapter adapter = new SqlDataAdapter();
+        DataTable table = new DataTable();
+        string command = ($"update Orders set Status='{state.Text}' where ID_zakaza='{ID}' ");
+        SqlCommand update = new SqlCommand(command, db.getConnection());
+        adapter.SelectCommand = update;
+        adapter.Fill(table);
+        if (update.ExecuteNonQuery() == 1)
+            MessageBox.Show("Статус заказа изменен!", "Успех",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        else
+            MessageBox.Show("Статус заказа не изменен!", "Неудача",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        RefreshDataGrid(Status);
+        state.Text = "";
+    }
+
+    private void search_Click(object sender, EventArgs e)
+    {
+        if (ZakID.Text != "")
+        {
+            RefreshDataGrid(Status);
+            Search(Status);
+        }
+        else
+            MessageBox.Show("Введите Данные!", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+    }
+
+    private void ChangeStatus_Load(object sender, EventArgs e)
+    {
+        CreateColumns();
+    }
+}
+public partial class ViewZak : Form
+{
+    DataBase db = new DataBase();
+    public ViewZak()
+    {
+        InitializeComponent();
+    }
+    private void CreateColumns()
+    {
+        ViewZakaz.Columns.Add("Name", "Название");
+        ViewZakaz.Columns.Add("Recipe", "Ингредиенты");
+        ViewZakaz.Columns.Add("Price", "Цена (дол)");
+        ViewZakaz.Columns.Add("Zakazchk", "Заказчик");
+        ViewZakaz.Columns.Add("Nomer", "Номер заказа");
+    }
+    private void ReadSingleRow(DataGridView dgw, IDataRecord record)
+    {
+        dgw.Rows.Add(record.GetString(0), record.GetString(1), record.GetInt32(2), record.GetString(3), record.GetInt32(4), RowState.ModifiedNew);
+    }
+    private void RefreshDataGrid(DataGridView dgw)
+    {
+        string idd = ZakID.Text;
+        int ID = Int32.Parse(idd);
+        dgw.Rows.Clear();
+        string query = $"select * from Zakaz where Nomer ='{ID}'";
+        SqlCommand command = new SqlCommand(query, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRow(dgw, reader);
+        }
+        reader.Close();
+    }
+    private void Search(DataGridView dgw)
+    {
+        string idd = ZakID.Text;
+        int ID = Int32.Parse(idd);
+        dgw.Rows.Clear();
+        string search = $"select * from Zakaz where Nomer ='{ID}'";
+        SqlCommand com = new SqlCommand(search, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRow(dgw, reader);
+        }
+        reader.Close();
+    }
+    private void back_Click(object sender, EventArgs e)
+    {
+        AdminProf adminProf = new AdminProf();
+        adminProf.Show();
+        this.Hide();
+    }
+
+    private void search_Click(object sender, EventArgs e)
+    {
+        if (ZakID.Text != "")
+        {
+            RefreshDataGrid(ViewZakaz);
+            Search(ViewZakaz);
+        }
+        else
+            MessageBox.Show("Введите Данные!", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+    }
+
+    private void ViewZak_Load(object sender, EventArgs e)
+    {
+        CreateColumns();
+    }
+}
+ public partial class ChangeStatPos : Form
+ {
+     DataBase db = new DataBase();
+     public ChangeStatPos()
+     {
+         InitializeComponent();
+     }
+     private void CreateColumnsP()
+     {
+         StatusPos.Columns.Add("ID", "Номер поставки");
+         StatusPos.Columns.Add("Firm", "Фирма");
+         StatusPos.Columns.Add("Postavka", "Поставка");
+         StatusPos.Columns.Add("Date_zak", "Дата заказа");
+         StatusPos.Columns.Add("Status", "Статус поставки");
+     }
+     private void ReadSingleRowP(DataGridView dgw, IDataRecord record)
+     {
+         dgw.Rows.Add(record.GetInt32(0), record.GetString(1), record.GetString(2), record.GetDateTime(3), record.GetString(4), RowState.ModifiedNew);
+     }
+     private void RefreshDataGridP(DataGridView dgw)
+     {
+         string idd = ZakID.Text;
+         int ID = Int32.Parse(idd);
+         dgw.Rows.Clear();
+         string query = $"select * from Postavki where ID_pos ='{ID}'";
+         SqlCommand command = new SqlCommand(query, db.getConnection());
+         db.openConnection();
+         SqlDataReader reader = command.ExecuteReader();
+         while (reader.Read())
+         {
+             ReadSingleRowP(dgw, reader);
+         }
+         reader.Close();
+     }
+     private void Search(DataGridView dgw)
+     {
+         string idd = ZakID.Text;
+         int ID = Int32.Parse(idd);
+         dgw.Rows.Clear();
+         string search = $"select * from Postavki where ID_pos ='{ID}'";
+         SqlCommand com = new SqlCommand(search, db.getConnection());
+         db.openConnection();
+         SqlDataReader reader = com.ExecuteReader();
+         while (reader.Read())
+         {
+             ReadSingleRowP(dgw, reader);
+         }
+         reader.Close();
+     }
+     private void back_Click(object sender, EventArgs e)
+     {
+         this.Hide();
+     }
+
+     private void ChangeStatPos_Load(object sender, EventArgs e)
+     {
+         CreateColumnsP();            
+     }
+
+     private void search_Click(object sender, EventArgs e)
+     {
+         if (ZakID.Text != "")
+         {
+             RefreshDataGridP(StatusPos);
+             Search(StatusPos);
+         }
+         else
+             MessageBox.Show("Введите Данные!", "Ошибка",
+                 MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+     }
+
+     private void ChangePos_Click(object sender, EventArgs e)
+     {
+         string idd = ZakID.Text;
+         int ID = Int32.Parse(idd);
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string command = ($"update Postavki set Status='{state.Text}' where ID_pos='{ID}' ");
+         SqlCommand update = new SqlCommand(command, db.getConnection());
+         adapter.SelectCommand = update;
+         adapter.Fill(table);
+         if (update.ExecuteNonQuery() == 1)
+             MessageBox.Show("Статус заказа изменен!", "Успех",
+                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+         else
+             MessageBox.Show("Статус заказа не изменен!", "Неудача",
+                 MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+         RefreshDataGridP(StatusPos);
+         state.Text = "";
+     }
+ }
+ public partial class ZakazPos : Form
+ {
+     DataBase db = new DataBase();
+     public ZakazPos()
+     {
+         InitializeComponent();
+     }
+
+     private void back_Click(object sender, EventArgs e)
+     {
+         AdminProf adminProf = new AdminProf();
+         adminProf.Show();
+         this.Hide();
+     }
+
+     private void NewSubOk_Click(object sender, EventArgs e)
+     {
+         if (Firm.Text=="" || Postavka.Text == "")
+         {
+             MessageBox.Show("Пожалуйста введите данные", "Ошибка",
+                   MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+         }
+         else
+         {
+             string status = "Ожидаемый";
+             SqlDataAdapter adapter = new SqlDataAdapter();
+             DataTable table = new DataTable();
+             string query = $"select * from Postavki";
+             SqlCommand cmd = new SqlCommand(query, db.getConnection());
+             adapter.SelectCommand = cmd;
+             db.openConnection();
+             if (table.Rows.Count == 0)
+             {
+                 SqlCommand insert = new SqlCommand($"insert into Postavki (Firm, Postavka, Date_zak, Status) values ('{Firm.Text}','{Postavka.Text}','{DatePos.Value}','{status}')", db.getConnection());
+                 if (insert.ExecuteNonQuery() == 1)
+                     MessageBox.Show("Заявка отправлена!", "Успешно",
+                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+             }
+             AdminProf adminProf = new AdminProf();
+             adminProf.Show();
+             this.Hide();
+         }
+     }
+ }
+public partial class SkladChange : Form
+{
+    DataBase db = new DataBase();
+    public SkladChange()
+    {
+        InitializeComponent();
+    }
+    private void CreateColumnsS()
+    {
+        Sklad.Columns.Add("Tovar", "Товар");
+        Sklad.Columns.Add("Kolvo", "Количество");
+        Sklad.Columns.Add("Izmer", "Ед. изм.");
+        Sklad.Columns.Add("SrokGod", "Срок годности");
+    }
+    private void ReadSingleRowS(DataGridView dgw, IDataRecord record)
+    {
+        dgw.Rows.Add(record.GetString(0), record.GetInt32(1), record.GetString(2), record.GetString(3), RowState.ModifiedNew);
+    }
+    private void RefreshDataGridS(DataGridView dgw)
+    {
+        dgw.Rows.Clear();
+        string query = $"select * from Sklad where Tovar ='{tovar.Text}'";
+        SqlCommand command = new SqlCommand(query, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRowS(dgw, reader);
+        }
+        reader.Close();
+    }
+    private void Search(DataGridView dgw)
+    {            
+        dgw.Rows.Clear();
+        string search = $"select * from Sklad where Tovar ='{tovar.Text}'";
+        SqlCommand com = new SqlCommand(search, db.getConnection());
+        db.openConnection();
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            ReadSingleRowS(dgw, reader);
+        }
+        reader.Close();
+    }
+    private void back_Click(object sender, EventArgs e)
+    {
+        this.Hide();
+    }
+
+    private void search_Click(object sender, EventArgs e)
+    {
+        if (tovar.Text != "")
+        {
+            RefreshDataGridS(Sklad);
+            Search(Sklad);
+        }
+        else
+            MessageBox.Show("Введите Данные!", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+    }
+
+    private void change_Click(object sender, EventArgs e)
+    {
+        SqlDataAdapter adapter = new SqlDataAdapter();
+        DataTable table = new DataTable();
+        string command = ($"update Sklad set Kolvo='{kolvo.Text}' where Tovar='{tovar.Text}'");
+        SqlCommand update = new SqlCommand(command, db.getConnection());
+        adapter.SelectCommand = update;
+        adapter.Fill(table);
+        if (update.ExecuteNonQuery() == 1)
+            MessageBox.Show("Количество товара изменено!", "Успех",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        else
+            MessageBox.Show("Количество товара не изменено!", "Неудача",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        RefreshDataGridS(Sklad);
+        kolvo.Text = "";
+    }
+
+    private void SkladChange_Load(object sender, EventArgs e)
+    {
+        CreateColumnsS();
+    }
+}
+  public partial class DobTov : Form
+  {
+      DataBase db = new DataBase();
+      public DobTov()
+      {
+          InitializeComponent();
+      }
+
+      private void back_Click(object sender, EventArgs e)
+      {
+          AdminProf adminProf = new AdminProf();
+          adminProf.Show();
+          this.Hide();
+      }
+
+      private void NewSubOk_Click(object sender, EventArgs e)
+      {
+          int kolvo =int.Parse(Kolvo.Text);
+          if (Tovar.Text == "" || Kolvo.Text == "" || Izmer.Text =="" || Srok.Text =="")
+          {
+              MessageBox.Show("Пожалуйста введите данные", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+          }
+          else
+          {
+              string status = "Ожидаемый";
+              SqlDataAdapter adapter = new SqlDataAdapter();
+              DataTable table = new DataTable();
+              string query = $"select * from Sklad";
+              SqlCommand cmd = new SqlCommand(query, db.getConnection());
+              adapter.SelectCommand = cmd;
+              db.openConnection();
+              if (table.Rows.Count == 0)
+              {
+                  SqlCommand insert = new SqlCommand($"insert into Sklad (Tovar, Kolvo, Izmer, SrokGod) values ('{Tovar.Text}','{kolvo}','{Izmer.Text}','{Srok.Text}')", db.getConnection());
+                  if (insert.ExecuteNonQuery() == 1)
+                      MessageBox.Show("Заявка отправлена!", "Успешно",
+                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+              }
+              AdminProf adminProf = new AdminProf();
+              adminProf.Show();
+              this.Hide();
+          }
+      }
+   }
+}
